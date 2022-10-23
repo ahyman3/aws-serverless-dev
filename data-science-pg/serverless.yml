@@ -1,3 +1,5 @@
+org: ahyman
+app: aws-lambda-dev
 service: data-science-pg
 
 frameworkVersion: '3'
@@ -7,5 +9,26 @@ provider:
   runtime: python3.8
 
 functions:
-  hello:
+  router:
     handler: test.handler
+    events:
+      - http:
+          method: POST
+          path: /
+          cors: true
+
+resources: # CloudFormation template syntax from here on.
+  Resources:
+    movieRecommender:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: movieRecommender
+        AttributeDefinitions:
+          - AttributeName: ID
+            AttributeType: S
+        KeySchema:
+          - AttributeName: ID
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
